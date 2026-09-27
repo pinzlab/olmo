@@ -4,6 +4,7 @@ export default defineConfig({
   entry: {
     'base/index': 'src/base/index.ts',
     'input/index': 'src/input/index.ts',
+    'schema/index': 'src/schema/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: true,
