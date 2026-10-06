@@ -2,51 +2,109 @@ import { describe, expect, it } from 'vitest'
 import { DecodeError } from '../../src/base'
 import { enumeration } from '../../src/input'
 
+enum Role {
+  Admin = 'admin',
+  User = 'user'
+}
+
+enum Code {
+  Pending = 1,
+  Active = 2,
+  Deleted = 3
+}
+
+enum Status {
+  Active,
+  Inactive
+}
+
 describe('enumeration', () => {
-  const f = enumeration('admin', 'user')
+  describe('Role', () => {
+    const f = enumeration(Role)
 
-  it('has an empty string as zero value', () => {
-    expect(f.zero()).toBe('')
+    it('has an empty string as zero value', () => {
+      expect(f.zero()).toBe('')
+    })
+
+    it('decodes valid values', () => {
+      expect(f.decode('admin')).toBe(Role.Admin)
+      expect(f.decode('user')).toBe(Role.User)
+    })
+
+    it('decodes empty and missing values as zero value', () => {
+      expect(f.decode('')).toBe('')
+      expect(f.decode(undefined)).toBe('')
+      expect(f.decode(null)).toBe('')
+    })
+
+    it('throws DecodeError for invalid values', () => {
+      expect(() => f.decode('guest')).toThrow(DecodeError)
+      expect(() => f.decode(99)).toThrow(DecodeError)
+      expect(() => f.decode({})).toThrow(DecodeError)
+    })
   })
 
-  it('decodes valid strings correctly', () => {
-    expect(f.decode('admin')).toBe('admin')
-    expect(f.decode('user')).toBe('user')
+  describe('Code', () => {
+    const f = enumeration(Code)
+
+    it('has an empty string as zero value', () => {
+      expect(f.zero()).toBe('')
+    })
+
+    it('decodes valid numeric values', () => {
+      expect(f.decode(Code.Pending)).toBe(Code.Pending)
+      expect(f.decode(Code.Active)).toBe(Code.Active)
+      expect(f.decode(Code.Deleted)).toBe(Code.Deleted)
+    })
+
+    it('coerces string numbers to numeric values', () => {
+      expect(f.decode('1')).toBe(Code.Pending)
+      expect(f.decode('2')).toBe(Code.Active)
+      expect(f.decode('3')).toBe(Code.Deleted)
+    })
+
+    it('decodes empty and missing values as zero value', () => {
+      expect(f.decode('')).toBe('')
+      expect(f.decode(undefined)).toBe('')
+      expect(f.decode(null)).toBe('')
+    })
+
+    it('throws DecodeError for invalid values', () => {
+      expect(() => f.decode(99)).toThrow(DecodeError)
+      expect(() => f.decode('99')).toThrow(DecodeError)
+      expect(() => f.decode('invalid')).toThrow(DecodeError)
+      expect(() => f.decode({})).toThrow(DecodeError)
+    })
   })
 
-  it('decodes an empty string as zero value', () => {
-    expect(f.decode('')).toBe('')
-  })
+  describe('Status', () => {
+    const f = enumeration(Status)
 
-  it('decodes missing values to zero value', () => {
-    expect(f.decode(undefined)).toBe('')
-    expect(f.decode(null)).toBe('')
-  })
+    it('has an empty string as zero value', () => {
+      expect(f.zero()).toBe('')
+    })
 
-  it('coerces string numbers to numbers if expected', () => {
-    const numEnum = enumeration(10, 20)
+    it('decodes valid numeric values', () => {
+      expect(f.decode(Status.Active)).toBe(Status.Active)
+      expect(f.decode(Status.Inactive)).toBe(Status.Inactive)
+    })
 
-    expect(numEnum.decode('20')).toBe(20)
-  })
+    it('coerces string numbers to numeric values', () => {
+      expect(f.decode('0')).toBe(Status.Active)
+      expect(f.decode('1')).toBe(Status.Inactive)
+    })
 
-  it('has an empty string as zero value for numeric enumerations', () => {
-    const numEnum = enumeration(10, 20)
+    it('decodes empty and missing values as zero value', () => {
+      expect(f.decode('')).toBe('')
+      expect(f.decode(undefined)).toBe('')
+      expect(f.decode(null)).toBe('')
+    })
 
-    expect(numEnum.zero()).toBe('')
-    expect(numEnum.decode('')).toBe('')
-    expect(numEnum.decode(undefined)).toBe('')
-    expect(numEnum.decode(null)).toBe('')
-  })
-
-  it('throws DecodeError on invalid enum values', () => {
-    expect(() => f.decode('guest')).toThrow(DecodeError)
-    expect(() => f.decode(99)).toThrow(DecodeError)
-    expect(() => f.decode({})).toThrow(DecodeError)
-  })
-
-  it('throws an Error during initialization if array is empty', () => {
-    expect(() => enumeration()).toThrowError(
-      'Enumeration must have at least one permitted value'
-    )
+    it('throws DecodeError for invalid values', () => {
+      expect(() => f.decode(99)).toThrow(DecodeError)
+      expect(() => f.decode('99')).toThrow(DecodeError)
+      expect(() => f.decode('invalid')).toThrow(DecodeError)
+      expect(() => f.decode({})).toThrow(DecodeError)
+    })
   })
 })
