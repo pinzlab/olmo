@@ -1,4 +1,5 @@
-import { DecodeError, type Field } from '../base'
+import { type InputField } from '../../base'
+import { DecodeError } from '../core/DecodeError'
 
 const TRUE_VALUES = new Set(['on', 'true', '1'])
 const FALSE_VALUES = new Set(['off', 'false', '0'])
@@ -24,10 +25,14 @@ const FALSE_VALUES = new Set(['off', 'false', '0'])
  * active.decode(undefined); // false
  * ```
  */
-export function boolean(): Field<boolean> {
+export function boolean(): InputField<boolean> {
   return {
     zero(): boolean {
       return false
+    },
+
+    isZero(value: boolean): boolean {
+      return value === false
     },
 
     decode(input: unknown): boolean {

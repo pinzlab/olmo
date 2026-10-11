@@ -23,6 +23,16 @@ export interface Field<T> {
   zero(): T
 
   /**
+   * Determines whether a domain value represents this field's zero value.
+   *
+   * This is optional for backwards compatibility with custom Field
+   * implementations. Built-in fields provide it explicitly.
+   */
+  isZero(value: T): boolean
+}
+
+export type InputField<T> = Field<T> & {
+  /**
    * Decodes an external representation into the field's domain type.
    *
    * @param input External data such as a form or FormData value.

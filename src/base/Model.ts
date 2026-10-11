@@ -1,9 +1,9 @@
-import { Field } from './Field'
+import { InputField } from './Field'
 
-export type ModelDefinition = Record<string, Field<unknown>>
+export type ModelDefinition = Record<string, InputField<unknown>>
 
 export type InferModelDefinition<D extends ModelDefinition> = {
-  [K in keyof D]: D[K] extends Field<infer T> ? T : never
+  [K in keyof D]: D[K] extends InputField<infer T> ? T : never
 }
 export type InferModel<M> = M extends Model<infer T> ? T : never
 

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import { DecodeError } from '../../src/base'
+import { DecodeError } from '../../src/input/core/DecodeError'
 import { enumeration } from '../../src/input'
+import { describe, expect, it } from 'vitest'
 
 enum Role {
   Admin = 'admin',

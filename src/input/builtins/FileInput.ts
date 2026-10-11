@@ -1,4 +1,5 @@
-import { DecodeError, type Field } from '../base'
+import { type InputField } from '../../base'
+import { DecodeError } from '../core/DecodeError'
 
 /**
  * Creates a file model field representing a File domain value.
@@ -10,10 +11,13 @@ import { DecodeError, type Field } from '../base'
  * const avatar = file();
  * const myFile = avatar.decode(formData.get("avatar"));
  */
-export function file(): Field<File> {
+export function file(): InputField<File> {
   return {
     zero(): File {
       return new File([], '')
+    },
+    isZero(value: File): boolean {
+      return value.size === 0 && value.name === '' && value.type === ''
     },
     decode(input: unknown): File {
       if (typeof File !== 'undefined' && input instanceof File) {

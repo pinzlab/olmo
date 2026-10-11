@@ -1,4 +1,5 @@
-import { DecodeError, type Field } from '../base'
+import { type InputField } from '../../base'
+import { DecodeError } from '../core/DecodeError'
 
 /**
  * Creates a string input field.
@@ -21,10 +22,14 @@ import { DecodeError, type Field } from '../base'
  * name.decode(undefined); // ""
  * ```
  */
-export function string(): Field<string> {
+export function string(): InputField<string> {
   return {
     zero(): string {
       return ''
+    },
+
+    isZero(value: string): boolean {
+      return value === ''
     },
 
     decode(input: unknown): string {

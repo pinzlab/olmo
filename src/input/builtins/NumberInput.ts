@@ -1,4 +1,5 @@
-import { DecodeError, type Field } from '../base'
+import { type InputField } from '../../base'
+import { DecodeError } from '../core/DecodeError'
 
 /**
  * Numeric string syntax accepted by the number decoder.
@@ -31,10 +32,14 @@ const NUMERIC_STRING_PATTERN = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/
  * age.decode(undefined); // 0
  * ```
  */
-export function number(): Field<number> {
+export function number(): InputField<number> {
   return {
     zero(): number {
       return 0
+    },
+
+    isZero(value: number): boolean {
+      return value === 0
     },
 
     decode(input: unknown): number {

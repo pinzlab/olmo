@@ -1,5 +1,5 @@
+import { DecodeError } from '../../src/input/core/DecodeError'
 import { describe, expect, it } from 'vitest'
-import { DecodeError } from '../../src/base'
 import { string } from '../../src/input'
 
 describe('string', () => {
