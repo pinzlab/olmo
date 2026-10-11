@@ -1,0 +1,100 @@
+import { Schema } from '../core/Schema'
+import { getSchemaConfig } from '../config/config'
+import { interpolateMessage } from '../core/interpolate'
+import type { Transformation, ValidationRule } from '../core/types'
+
+/**
+ * A schema for validating boolean domain values.
+ *
+ * BooleanSchema never decodes external representations. Its input is already
+ * a boolean produced by the Model/Field layer.
+ *
+ * @typeParam M - Complete model type used by the eventual object Schema.
+ */
+export class BooleanSchema<M extends object = object> extends Schema<
+  boolean,
+  boolean,
+  M
+> {
+  public constructor(
+    rules: readonly ValidationRule<boolean>[] = [],
+    transformations: readonly Transformation<boolean>[] = []
+  ) {
+    super({
+      rules: [
+        {
+          code: 'boolean.invalid',
+          validate: ({ value }) => {
+            if (typeof value === 'boolean') {
+              return null
+            }
+
+            return {
+              code: 'boolean.invalid',
+              context: {}
+            }
+          }
+        },
+        ...rules
+      ],
+      transformations,
+      zeroPolicy: 'preserve',
+      field: {
+        zero: () => false,
+        isZero: value => value === false
+      },
+      messageResolver: failure => {
+        if (failure.message !== undefined) {
+          return interpolateMessage(failure.message, failure.context)
+        }
+
+        const [namespace, rule] = failure.code.split('.')
+
+        if (namespace !== 'boolean') {
+          return failure.code
+        }
+
+        const messages = getSchemaConfig().messages.boolean
+        const template = messages[rule as keyof typeof messages]
+
+        if (template === undefined) {
+          return failure.code
+        }
+
+        return interpolateMessage(template, failure.context)
+      },
+      output: value => value
+    })
+  }
+
+  /**
+   * Adds a custom boolean validation rule.
+   *
+   * @param validator Function receiving the domain boolean.
+   * @param code Stable validation code.
+   */
+  public custom(
+    validator: (value: boolean) => boolean,
+    code = 'boolean.custom',
+    message?: string
+  ): BooleanSchema<M> {
+    return this.withRule({
+      code,
+      validate: ({ value }) => {
+        if (validator(value)) {
+          return null
+        }
+
+        return {
+          code,
+          context: {},
+          message
+        }
+      }
+    })
+  }
+
+  private withRule(rule: ValidationRule<boolean>): BooleanSchema<M> {
+    return new BooleanSchema<M>([...this.getRules(), rule], this.getTransformations())
+  }
+}
