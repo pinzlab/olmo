@@ -2,14 +2,30 @@ import { type InputField } from '../../base'
 import { DecodeError } from '../core/DecodeError'
 
 /**
- * Creates a file model field representing a File domain value.
- * Zero value: new File([], "")
+ * Creates a file input field whose domain type is the browser `File` object.
  *
- * @returns A ModelField capable of safely decoding File objects.
+ * The domain zero value is an empty `File` with no name, no content, and no
+ * MIME type (`new File([], "")`). A value is considered zero when its `size`,
+ * `name`, and `type` are all empty.
+ *
+ * Only actual `File` instances are accepted at the decoding boundary.
+ * `null`, `undefined`, and the empty string resolve to the zero value.
+ * Any other input throws a `DecodeError`.
+ *
+ * In environments where the `File` API is unavailable, decoding missing input
+ * also throws a `DecodeError`.
+ *
+ * @returns A field whose domain type is `File`.
+ * @throws {DecodeError} If the input cannot be decoded into a `File`.
  *
  * @example
+ * ```ts
  * const avatar = file();
- * const myFile = avatar.decode(formData.get("avatar"));
+ *
+ * avatar.zero(); // new File([], "")
+ * avatar.decode(someFile); // someFile
+ * avatar.decode(undefined); // new File([], "")
+ * ```
  */
 export function file(): InputField<File> {
   return {

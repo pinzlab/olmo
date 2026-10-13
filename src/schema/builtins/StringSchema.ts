@@ -61,7 +61,12 @@ export class StringSchema<M extends object = object> extends Schema<string, stri
   }
 
   /**
-   * Required string
+   * Requires the string to be non-empty.
+   *
+   * Fails when the value equals the zero value (the empty string `""`).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
    */
   public required(message?: string): StringSchema<M> {
     return this.withRule({

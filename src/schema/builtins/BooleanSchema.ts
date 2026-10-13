@@ -70,8 +70,19 @@ export class BooleanSchema<M extends object = object> extends Schema<
   /**
    * Adds a custom boolean validation rule.
    *
-   * @param validator Function receiving the domain boolean.
-   * @param code Stable validation code.
+   * @param validator Function that receives the domain boolean and returns
+   * `true` if the value is valid, `false` otherwise.
+   * @param code Stable machine-readable validation code.
+   * @param message Optional human-readable error message.
+   * @returns A new schema with the custom rule added.
+   *
+   * @example
+   * ```ts
+   * const activeSchema = boolean().custom(
+   *   value => value === true,
+   *   'boolean.mustBeTrue'
+   * );
+   * ```
    */
   public custom(
     validator: (value: boolean) => boolean,

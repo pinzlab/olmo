@@ -62,6 +62,13 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be greater than or equal to `minimum`.
+   *
+   * @param minimum The inclusive lower bound.
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public min(minimum: number, message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.min',
@@ -79,6 +86,13 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be less than or equal to `maximum`.
+   *
+   * @param maximum The inclusive upper bound.
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public max(maximum: number, message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.max',
@@ -96,6 +110,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be an integer (no fractional component).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public integer(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.integer',
@@ -113,6 +133,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be strictly greater than zero.
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public positive(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.positive',
@@ -130,6 +156,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be strictly less than zero.
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public negative(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.negative',
@@ -147,6 +179,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be greater than or equal to zero.
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public nonnegative(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.nonnegative',
@@ -164,6 +202,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be less than or equal to zero.
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public nonpositive(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.nonpositive',
@@ -181,6 +225,12 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be finite (not `Infinity`, `-Infinity`, or `NaN`).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public finite(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.finite',
@@ -198,6 +248,13 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Requires the number to be a safe integer
+   * (within `Number.MIN_SAFE_INTEGER` to `Number.MAX_SAFE_INTEGER`).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
   public safe(message?: string): NumberSchema<M> {
     return this.withRule({
       code: 'number.safe',
@@ -215,6 +272,23 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
     })
   }
 
+  /**
+   * Adds a custom number validation rule.
+   *
+   * @param validator Function that receives the domain number and returns
+   * `true` if the value is valid, `false` otherwise.
+   * @param code Stable machine-readable validation code.
+   * @param message Optional human-readable error message.
+   * @returns A new schema with the custom rule added.
+   *
+   * @example
+   * ```ts
+   * const evenSchema = number().custom(
+   *   value => value % 2 === 0,
+   *   'number.even'
+   * );
+   * ```
+   */
   public custom(
     validator: (value: number) => boolean,
     code = 'number.custom',

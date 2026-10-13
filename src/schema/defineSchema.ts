@@ -2,9 +2,12 @@ import { Schema } from './core/Schema'
 import type { FieldError, ValidationError } from './core/error'
 
 /**
- * Schemas accepted by individual fields.
+ * An unkeyed Schema instance accepted at the input boundary of a schema map.
+ *
+ * Uses `unknown` for the input, output, and model positions to act as the
+ * widest structural supertype without introducing `any`.
  */
-export type SchemaDefinitionMap = Record<string, Schema<any, any, any>>
+export type SchemaDefinitionMap = Record<string, Schema<unknown, unknown, object>>
 
 /**
  * Restricts a schema definition so its keys and field types match
@@ -14,24 +17,24 @@ export type SchemaDefinitionMap = Record<string, Schema<any, any, any>>
  * a known model type.
  */
 export type StrictSchemaDefinition<M extends object> = {
-  [K in keyof M]?: Schema<M[K], any, any>
+  [K in keyof M]?: Schema<M[K], unknown, object>
 }
 
 /**
  * Extracts the domain input type from a field Schema.
  */
-export type InferSchemaInput<S> = S extends Schema<infer T, any, any> ? T : never
+export type InferSchemaInput<S> = S extends Schema<infer T, unknown, object> ? T : never
 
 /**
  * Extracts the server output type from a field Schema.
  */
-export type InferSchemaOutput<S> = S extends Schema<any, infer O, any> ? O : never
+export type InferSchemaOutput<S> = S extends Schema<unknown, infer O, object> ? O : never
 
 /**
  * Keys whose schemas may omit their output.
  */
 export type OptionalSchemaKeys<D extends object> = {
-  [K in keyof D]-?: D[K] extends Schema<any, any, any>
+  [K in keyof D]-?: D[K] extends Schema<unknown, unknown, object>
     ? undefined extends InferSchemaOutput<D[K]>
       ? K
       : never
@@ -49,7 +52,7 @@ export type RequiredSchemaKeys<D extends object> = Exclude<keyof D, OptionalSche
  * An undefined result means that the property is omitted.
  */
 export type DefinedSchemaOutput<S> =
-  S extends Schema<any, any, any> ? Exclude<InferSchemaOutput<S>, undefined> : never
+  S extends Schema<unknown, unknown, object> ? Exclude<InferSchemaOutput<S>, undefined> : never
 
 /**
  * Infers the data payload produced by an object schema.
@@ -58,11 +61,11 @@ export type DefinedSchemaOutput<S> =
  * Nullable schemas remain required and preserve null.
  */
 export type InferSchemaObjectData<D extends object> = {
-  [K in RequiredSchemaKeys<D>]: D[K] extends Schema<any, any, any>
+  [K in RequiredSchemaKeys<D>]: D[K] extends Schema<unknown, unknown, object>
     ? DefinedSchemaOutput<D[K]>
     : never
 } & {
-  [K in OptionalSchemaKeys<D>]?: D[K] extends Schema<any, any, any>
+  [K in OptionalSchemaKeys<D>]?: D[K] extends Schema<unknown, unknown, object>
     ? DefinedSchemaOutput<D[K]>
     : never
 }
@@ -109,7 +112,7 @@ export class ObjectSchema<
 
     for (const key of Object.keys(this.definition)) {
       const schema = (
-        this.definition as Record<string, Schema<any, any, any> | undefined>
+        this.definition as Record<string, Schema<unknown, unknown, object> | undefined>
       )[key]
 
       if (!schema) {
@@ -171,7 +174,7 @@ export class ObjectSchema<
 
     for (const key of Object.keys(this.definition)) {
       const schema = (
-        this.definition as Record<string, Schema<any, any, any> | undefined>
+        this.definition as Record<string, Schema<unknown, unknown, object> | undefined>
       )[key]
 
       if (!schema) {
@@ -227,14 +230,33 @@ export class ObjectSchema<
 }
 
 /**
- * Defines an object-level validation Schema.
+ * Defines an object-level validation Schema bound to a domain model.
  *
- * The model type is supplied explicitly and determines the accepted
- * domain values. The definition may be partial: only supplied fields
- * are validated and projected.
+ * The model type `M` determines which fields are accepted by the schema
+ * definition. The definition may be partial: only provided fields are
+ * validated and projected.
  *
- * Field / defineObject remain responsible for decoding external data.
- * defineSchema is responsible only for domain validation and projection.
+ * `defineObject` and its input fields are responsible for decoding external
+ * data. `defineSchema` is responsible only for domain validation and
+ * server-side projection.
+ *
+ * @param definition A partial mapping of model field names to field schemas.
+ * @returns An `ObjectSchema` that validates and projects values of type `M`.
+ *
+ * @example
+ * ```ts
+ * interface User {
+ *   name: string;
+ *   age: number;
+ * }
+ *
+ * const UserSchema = defineSchema<User>({
+ *   name: string().required().max(100),
+ *   age: number().integer().min(0),
+ * });
+ *
+ * const [data, errors] = UserSchema.safeParse(user);
+ * ```
  */
 export function defineSchema<
   M extends object,

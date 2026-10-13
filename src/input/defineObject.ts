@@ -1,37 +1,37 @@
 import type { InferModelDefinition, Model, ModelDefinition } from '../base'
 
-/**
- * Checks if a given input is a FormData instance safely in any environment.
- * @param data The input to check.
- */
 function isFormData(data: unknown): data is FormData {
   return typeof FormData !== 'undefined' && data instanceof FormData
 }
 
 /**
- * Defines a new complete domain model bound strictly to the given field definition.
+ * Defines a domain model bound to the given field definitions.
  *
- * @param definition A mapping of keys to ModelFields.
- * @returns A Model API for creating, emptying, and decoding strictly typed instances.
+ * Returns a `Model` that can create new instances with zero values
+ * and decode external representations such as `FormData` or plain objects.
+ *
+ * @param definition A mapping of field names to their input field definitions.
+ * @returns A `Model` whose domain type is inferred from `definition`.
  *
  * @example
+ * ```ts
  * const User = defineObject({
  *   name: string(),
  *   age: number(),
- *   active: boolean()
+ *   active: boolean(),
  * });
  *
- * const user = User.empty();
- * user.set('name', 'John');
+ * const user = User.create({ name: 'Alice' });
+ * // { name: 'Alice', age: 0, active: false }
+ *
+ * const decoded = User.decode(formData);
+ * ```
  */
 export function defineObject<D extends ModelDefinition>(
   definition: D
 ): Model<InferModelDefinition<D>> {
   type T = InferModelDefinition<D>
 
-  /**
-   * Helper to attach prototype to raw dictionary to form a model instance.
-   */
   function createInstance(data: Record<string, unknown>): T {
     const instance = Object.create({})
     for (const key of Object.keys(definition)) {

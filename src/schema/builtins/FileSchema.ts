@@ -167,24 +167,9 @@ export class FileSchema<M extends object = object> extends Schema<File, File, M>
   }
 
   private withRule(rule: ValidationRule<File>): FileSchema<M> {
-    // We get the actual rules array, but need to remove the first 'file.invalid' base rule added by constructor
-    // because it will be added again inside `super()` of the new schema. Wait, no.
-    // Schema doesn't recreate from constructor parameters during `withRule` logic, it just passes rules.
-    // Notice how StringSchema implements `withRule`:
-    // It passes `this.getRules()` to the constructor.
-    // If we look at StringSchema:
-    // private withRule(rule: ValidationRule<string>): StringSchema<M> {
-    //   return new StringSchema<M>([...this.getRules(), rule], this.getTransformations())
-    // }
-    // BUT the constructor of StringSchema does NOT add a base rule to `rules`, it just passes it to `super({ rules })`.
-    // My constructor prepends the `file.invalid` rule to `rules` inside `super({ rules: [...] })`.
-    // This means if I pass `this.getRules()` to constructor, it will duplicate `file.invalid`.
-    // To solve this, the constructor should separate `internalRules` and `userRules`.
-    // Let me rewrite the constructor to filter out the base rule if it's already there, OR
-    // I can just filter it out before passing it up.
-    // In fact, the easiest way is just to keep track of user rules in a property, or filter.
-    // The rules returned by `getRules()` include `file.invalid`.
-    // Let's filter it by code.
+    // The constructor prepends `file.invalid` to `rules`, so it must be
+    // filtered out before passing the current rules back to the constructor
+    // to prevent duplicate base-rule entries.
     const userRules = this.getRules().filter(r => r.code !== 'file.invalid')
     return new FileSchema<M>([...userRules, rule], this.getTransformations())
   }

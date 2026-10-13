@@ -295,14 +295,14 @@ export class Schema<T, O, M extends object> {
    * @param message Optional custom validation message.
    */
   public refine(
-    validator: (value: T, model: any) => boolean | Promise<boolean>,
+    validator: (value: T, model: M | undefined) => boolean | Promise<boolean>,
     code = 'schema.refine',
     message?: string
   ): Schema<T, O, M> {
     const refinement: ValidationRule<T> = {
       code,
       validate: ({ value, model }) => {
-        const result = validator(value, model)
+        const result = validator(value, model as M | undefined)
 
         const toFailure = (isValid: boolean): ValidationFailure | null => {
           if (isValid) {
