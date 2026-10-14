@@ -72,6 +72,9 @@ export interface NumberMessages {
   /** Message returned when the value is not a valid number. */
   readonly invalid: string
 
+  /** Message returned when a required number is zero. */
+  readonly required: string
+
   /** Message returned when the number is smaller than the minimum allowed value. */
   readonly min: string
 
@@ -106,6 +109,9 @@ export interface NumberMessages {
 export interface BooleanMessages {
   /** Message returned when the value is not a valid boolean. */
   readonly invalid: string
+
+  /** Message returned when a required boolean is false. */
+  readonly required: string
 }
 
 /**
@@ -114,6 +120,9 @@ export interface BooleanMessages {
 export interface FileMessages {
   /** Message returned when the value is not a valid file. */
   readonly invalid: string
+
+  /** Message returned when a required file is missing (zero value). */
+  readonly required: string
 
   /** Message returned when the file is smaller than the minimum allowed size. */
   readonly minSize: string

@@ -56,6 +56,25 @@ describe('EnumerationSchema', () => {
     })
   })
 
+  describe('required', () => {
+    it('accepts non-empty enumerations', () => {
+      const schema = enumeration(Role).required()
+
+      expect(schema.parse(Role.User)).toBe('user')
+    })
+
+    it('rejects empty enumerations', () => {
+      const schema = enumeration(Role).required()
+      const [error] = schema.safeParseUnknown('')
+      expect(error).toMatchObject({
+        _schema: {
+          code: 'enumeration.required',
+          message: 'This field is required'
+        }
+      })
+    })
+  })
+
   describe('custom', () => {
     it('supports custom validators', () => {
       const schema = enumeration(Role).custom(

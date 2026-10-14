@@ -2,6 +2,7 @@ import { Schema } from '../core/Schema'
 import { getSchemaConfig } from '../config/config'
 import type { Transformation, ValidationRule } from '../core/types'
 import { interpolateMessage } from '../core/interpolate'
+import { string as inputString } from '../../input'
 
 /**
  * A schema for validating and transforming string domain values.
@@ -31,8 +32,8 @@ export class StringSchema<M extends object = object> extends Schema<string, stri
       zeroPolicy: 'preserve',
 
       field: {
-        zero: () => '',
-        isZero: value => value === ''
+        zero: inputString().zero,
+        isZero: inputString().isZero
       },
 
       messageResolver: failure => {

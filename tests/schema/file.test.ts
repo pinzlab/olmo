@@ -55,7 +55,29 @@ describe('FileSchema', () => {
       expect((error as any)?._schema.message).toBe('Invalid file')
     })
   })
+  describe('required', () => {
+    it('accepts non-empty files', () => {
+      const schema = file().required()
+      const value = new File(['content'], 'document.txt', {
+        type: 'text/plain'
+      })
 
+      expect(schema.parse(value)).toBe(value)
+    })
+
+    it('rejects empty files', () => {
+      const schema = file().required()
+      const value = schema.zero()
+
+      const [error] = schema.safeParseUnknown(value)
+      expect(error).toMatchObject({
+        _schema: {
+          code: 'file.required',
+          message: 'This field is required'
+        }
+      })
+    })
+  })
   describe('minSize', () => {
     it('accepts files meeting or exceeding minimum size', () => {
       const schema = file().minSize(1024)

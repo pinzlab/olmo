@@ -2,6 +2,7 @@ import { Schema } from '../core/Schema'
 import { getSchemaConfig } from '../config/config'
 import { interpolateMessage } from '../core/interpolate'
 import type { Transformation, ValidationRule } from '../core/types'
+import { boolean as inputBoolean } from '../../input'
 
 /**
  * A schema for validating boolean domain values.
@@ -40,8 +41,8 @@ export class BooleanSchema<M extends object = object> extends Schema<
       transformations,
       zeroPolicy: 'preserve',
       field: {
-        zero: () => false,
-        isZero: value => value === false
+        zero: inputBoolean().zero,
+        isZero: inputBoolean().isZero
       },
       messageResolver: failure => {
         if (failure.message !== undefined) {
@@ -64,6 +65,31 @@ export class BooleanSchema<M extends object = object> extends Schema<
         return interpolateMessage(template, failure.context)
       },
       output: value => value
+    })
+  }
+
+  /**
+   * Requires the boolean to be `true`.
+   *
+   * Fails when the value equals the zero value (`false`).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
+  public required(message?: string): BooleanSchema<M> {
+    return this.withRule({
+      code: 'boolean.required',
+      validate: ({ value }) => {
+        if (value !== false) {
+          return null
+        }
+
+        return {
+          code: 'boolean.required',
+          context: {},
+          message
+        }
+      }
     })
   }
 

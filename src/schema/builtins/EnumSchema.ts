@@ -3,6 +3,7 @@ import { interpolateMessage } from '../core/interpolate'
 import { getSchemaConfig } from '../config/config'
 import { Schema } from '../core/Schema'
 import { Enum } from '../../base'
+import { enumeration } from '../../input'
 
 /**
  * A schema for validating values belonging to a TypeScript enumeration.
@@ -66,8 +67,8 @@ export class EnumerationSchema<E extends Enum, M extends object = object> extend
       zeroPolicy: 'preserve',
 
       field: {
-        zero: () => '' as E[keyof E],
-        isZero: value => value === ''
+        zero: enumeration(enumObject).zero,
+        isZero: enumeration(enumObject).isZero
       },
 
       messageResolver: failure => {

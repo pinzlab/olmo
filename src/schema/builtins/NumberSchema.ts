@@ -2,6 +2,7 @@ import { Schema } from '../core/Schema'
 import { getSchemaConfig } from '../config/config'
 import { interpolateMessage } from '../core/interpolate'
 import type { Transformation, ValidationRule } from '../core/types'
+import { number as inputNumber } from '../../input'
 
 /**
  * A schema for validating number domain values.
@@ -35,8 +36,8 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
       transformations,
       zeroPolicy: 'preserve',
       field: {
-        zero: () => 0,
-        isZero: value => value === 0
+        zero: inputNumber().zero,
+        isZero: inputNumber().isZero
       },
       messageResolver: failure => {
         if (failure.message !== undefined) {
@@ -59,6 +60,31 @@ export class NumberSchema<M extends object = object> extends Schema<number, numb
         return interpolateMessage(template, failure.context)
       },
       output: value => value
+    })
+  }
+
+  /**
+   * Requires the number to be non-zero.
+   *
+   * Fails when the value equals the zero value (`0`).
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
+  public required(message?: string): NumberSchema<M> {
+    return this.withRule({
+      code: 'number.required',
+      validate: ({ value }) => {
+        if (value !== 0) {
+          return null
+        }
+
+        return {
+          code: 'number.required',
+          context: {},
+          message
+        }
+      }
     })
   }
 

@@ -16,6 +16,10 @@ export function configureSchema(override: SchemaConfigOverride): void {
         ...currentMessages.string,
         ...override.messages?.string
       },
+      format: {
+        ...currentMessages.format,
+        ...override.messages?.format
+      },
       number: {
         ...currentMessages.number,
         ...override.messages?.number

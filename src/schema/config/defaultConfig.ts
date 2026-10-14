@@ -24,6 +24,7 @@ export const defaultSchemaConfig: SchemaConfig = {
     },
     number: {
       invalid: 'Invalid number',
+      required: 'This field is required',
       min: 'Must be greater than or equal to {min}',
       max: 'Must be less than or equal to {max}',
       integer: 'Must be an integer',
@@ -35,7 +36,8 @@ export const defaultSchemaConfig: SchemaConfig = {
       safe: 'Must be a safe integer'
     },
     boolean: {
-      invalid: 'Invalid boolean'
+      invalid: 'Invalid boolean',
+      required: 'This field is required'
     },
     enumeration: {
       invalid: 'Invalid enumeration value',
@@ -43,6 +45,7 @@ export const defaultSchemaConfig: SchemaConfig = {
     },
     file: {
       invalid: 'Invalid file',
+      required: 'This field is required',
       minSize: 'Must be at least {min} bytes',
       maxSize: 'Must be at most {max} bytes',
       mimeType: 'Invalid file type'

@@ -1,3 +1,5 @@
+export type { SchemaDefinition } from './defineSchema'
+
 export { configure, getConfig, resetConfig } from './configure'
 export { defineSchema } from './defineSchema'
 

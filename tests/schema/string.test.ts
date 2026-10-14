@@ -18,9 +18,12 @@ describe('StringSchema', () => {
     it('rejects empty strings', () => {
       const schema = string().required()
       const [error] = schema.safeParseUnknown('')
-
-      expect((error as any)?._schema.code).toBe('string.required')
-      expect((error as any)?._schema.message).toBe('This field is required')
+      expect(error).toMatchObject({
+        _schema: {
+          code: 'string.required',
+          message: 'This field is required'
+        }
+      })
     })
   })
 

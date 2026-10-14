@@ -33,7 +33,7 @@ export function file(): InputField<File> {
       return new File([], '')
     },
     isZero(value: File): boolean {
-      return value.size === 0 && value.name === '' && value.type === ''
+      return value.size === 0 && value.name === ''
     },
     decode(input: unknown): File {
       if (typeof File !== 'undefined' && input instanceof File) {

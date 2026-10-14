@@ -1,7 +1,8 @@
-import { Schema } from '../core/Schema'
-import { getSchemaConfig } from '../config/config'
 import type { Transformation, ValidationRule } from '../core/types'
 import { interpolateMessage } from '../core/interpolate'
+import { getSchemaConfig } from '../config/config'
+import { file as inputFile } from '../../input'
+import { Schema } from '../core/Schema'
 
 /**
  * A schema for validating domain File values.
@@ -43,8 +44,8 @@ export class FileSchema<M extends object = object> extends Schema<File, File, M>
       zeroPolicy: 'preserve',
 
       field: {
-        zero: () => (typeof File !== 'undefined' ? new File([], '') : ({} as File)),
-        isZero: value => value.size === 0 && value.name === '' && value.type === ''
+        zero: inputFile().zero,
+        isZero: inputFile().isZero
       },
 
       messageResolver: failure => {
@@ -69,6 +70,31 @@ export class FileSchema<M extends object = object> extends Schema<File, File, M>
       },
 
       output: value => value
+    })
+  }
+
+  /**
+   * Requires the file to be non-empty (not the zero value).
+   *
+   * Fails when the value is the zero file produced by the `file()` field.
+   *
+   * @param message Optional custom error message.
+   * @returns A new schema with the rule added.
+   */
+  public required(message?: string): FileSchema<M> {
+    return this.withRule({
+      code: 'file.required',
+      validate: ({ value }) => {
+        if (!this.isZero(value)) {
+          return null
+        }
+
+        return {
+          code: 'file.required',
+          context: {},
+          message
+        }
+      }
     })
   }
 
@@ -119,6 +145,9 @@ export class FileSchema<M extends object = object> extends Schema<File, File, M>
     return this.withRule({
       code: 'file.mimeType',
       validate: ({ value }) => {
+        if (this.isZero(value)) {
+          return null
+        }
         if (allowedMimeTypes.includes(value.type)) {
           return null
         }

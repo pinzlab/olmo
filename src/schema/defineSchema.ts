@@ -2,21 +2,13 @@ import { Schema } from './core/Schema'
 import type { FieldError, ValidationError } from './core/error'
 
 /**
- * An unkeyed Schema instance accepted at the input boundary of a schema map.
- *
- * Uses `unknown` for the input, output, and model positions to act as the
- * widest structural supertype without introducing `any`.
- */
-export type SchemaDefinitionMap = Record<string, Schema<unknown, unknown, object>>
-
-/**
  * Restricts a schema definition so its keys and field types match
  * the domain model M. Fields may be omitted.
  *
  * Unknown keys are rejected when the definition is checked against
  * a known model type.
  */
-export type StrictSchemaDefinition<M extends object> = {
+export type SchemaDefinition<M extends object> = {
   [K in keyof M]?: Schema<M[K], unknown, object>
 }
 
@@ -52,7 +44,9 @@ export type RequiredSchemaKeys<D extends object> = Exclude<keyof D, OptionalSche
  * An undefined result means that the property is omitted.
  */
 export type DefinedSchemaOutput<S> =
-  S extends Schema<unknown, unknown, object> ? Exclude<InferSchemaOutput<S>, undefined> : never
+  S extends Schema<unknown, unknown, object>
+    ? Exclude<InferSchemaOutput<S>, undefined>
+    : never
 
 /**
  * Infers the data payload produced by an object schema.
@@ -92,7 +86,7 @@ export type InferSchemaObjectOutput<M extends object, D extends object> =
  */
 export class ObjectSchema<
   M extends object,
-  D extends StrictSchemaDefinition<M> = StrictSchemaDefinition<M>
+  D extends SchemaDefinition<M> = SchemaDefinition<M>
 > {
   private readonly definition: D
 
@@ -260,7 +254,7 @@ export class ObjectSchema<
  */
 export function defineSchema<
   M extends object,
-  D extends StrictSchemaDefinition<M> = StrictSchemaDefinition<M>
+  D extends SchemaDefinition<M> = SchemaDefinition<M>
 >(definition: D): ObjectSchema<M, D> {
   return new ObjectSchema<M, D>(definition)
 }

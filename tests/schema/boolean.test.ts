@@ -17,6 +17,25 @@ describe('BooleanSchema', () => {
     })
   })
 
+  describe('required', () => {
+    it('accepts non-empty booleans', () => {
+      const schema = boolean().required()
+
+      expect(schema.parse(true)).toBe(true)
+    })
+
+    it('rejects empty booleans', () => {
+      const schema = boolean().required()
+      const [error] = schema.safeParseUnknown(false)
+      expect(error).toMatchObject({
+        _schema: {
+          code: 'boolean.required',
+          message: 'This field is required'
+        }
+      })
+    })
+  })
+
   describe('custom', () => {
     it('invokes custom validation logic', () => {
       const schema = boolean().custom(val => val === true, 'boolean.mustBeTrue')

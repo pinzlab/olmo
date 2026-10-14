@@ -17,6 +17,25 @@ describe('NumberSchema', () => {
     })
   })
 
+  describe('required', () => {
+    it('accepts non-empty numbers', () => {
+      const schema = number().required()
+
+      expect(schema.parse(1)).toBe(1)
+    })
+
+    it('rejects empty numbers', () => {
+      const schema = number().required()
+      const [error] = schema.safeParseUnknown(0)
+      expect(error).toMatchObject({
+        _schema: {
+          code: 'number.required',
+          message: 'This field is required'
+        }
+      })
+    })
+  })
+
   describe('min', () => {
     it('accepts values greater than or equal to min', () => {
       const schema = number().min(5)
